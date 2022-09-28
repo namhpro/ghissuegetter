@@ -1,0 +1,26 @@
+{
+  "name": "ghissuegetter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "twatch": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/namhpro/ghissuegetter.git"
+  },
+  "author": "namh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/namhpro/ghissuegetter/issues"
+  },
+  "homepage": "https://github.com/namhpro/ghissuegetter#readme",
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  },
+  "dependencies": {
+    "octokit": "^2.0.7"
+  }
+}

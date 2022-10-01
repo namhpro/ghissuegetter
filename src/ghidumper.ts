@@ -36,7 +36,7 @@ export class GhiDumper {
     for await (const { data: issues } of iterator) {
       for (const issue of issues) {
 
-        const filename = path.join(outDir, `${String(issue.number).padStart(2, '0')}.html`)
+        const filename = path.join(outDir, `${String(issue.number).padStart(2, '0')}-${issue.title.replace(/[\/\?\=\*]/g, '_')}.html`)
 
         console.log("Issue #%d: %s", issue.number, issue.title);
 

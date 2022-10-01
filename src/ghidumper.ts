@@ -1,7 +1,6 @@
 import { Octokit } from "octokit";
 import * as fs from "fs";
 import { marked } from 'marked';
-import { JSDOM } from 'jsdom';
 
 export class GhiDumper {
   octokit: Octokit

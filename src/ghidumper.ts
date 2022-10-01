@@ -11,7 +11,7 @@ export class GhiDumper {
   constructor(repo: string) {
     this.repo = repo
     // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
-    this.octokit = new Octokit({ auth: `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` });
+    this.octokit = new Octokit({ auth: `...` });
 
   }
 
@@ -46,7 +46,7 @@ export class GhiDumper {
         })
 
         this._writeTemplate(wstream, issue.title)
-        wstream.write(`<h2>${issue.title}</h2>`)
+        wstream.write(`<h1>${issue.title}</h1>`)
         
         const html = marked.parse(issue.body);
         wstream.write(html)

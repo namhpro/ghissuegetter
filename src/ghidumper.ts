@@ -1,6 +1,7 @@
 import { Octokit } from "octokit";
 import * as fs from "fs";
 import { marked } from 'marked';
+import * as path from 'path';
 
 export class GhiDumper {
   octokit: Octokit
@@ -10,7 +11,7 @@ export class GhiDumper {
   constructor(repo: string) {
     this.repo = repo
     // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
-    this.octokit = new Octokit({ auth: `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` });
+    this.octokit = new Octokit({ auth: `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` });
 
   }
 
@@ -29,11 +30,13 @@ export class GhiDumper {
       state: "all",
     });
 
+    const outDir = path.join(__dirname, 'out')
+    this._createOutDir(outDir)
     // iterate through each response
     for await (const { data: issues } of iterator) {
       for (const issue of issues) {
 
-        const filename = `${String(issue.number).padStart(2, '0')}.html`
+        const filename = path.join(outDir, `${String(issue.number).padStart(2, '0')}.html`)
 
         console.log("Issue #%d: %s", issue.number, issue.title);
 
@@ -92,5 +95,18 @@ export class GhiDumper {
     wstream.write('</body>\n')
     wstream.write('</html>\n')
 
+  }
+
+  async _createOutDir(path: string){
+    let accessRes
+    try{
+      accessRes = await fs.promises.access(path)
+    }catch(err){
+      if(err.errno == -4058){
+        // not created output directory yet
+        fs.promises.mkdir(path)
+      }
+    }
+    
   }
 }

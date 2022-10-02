@@ -12,7 +12,6 @@ export class GhiDumper {
     this.repo = repo
     // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
     this.octokit = new Octokit({ auth: `...` });
-
   }
 
   async getAuth() {
@@ -47,9 +46,9 @@ export class GhiDumper {
 
         this._writeTemplate(wstream, issue.title)
         wstream.write(`<h1>${issue.title}</h1>`)
-        
+
         const html = marked.parse(issue.body);
-        wstream.write(html)
+        wstream.write(`<div class='content'>${html}</div>`)
 
         await this._getAllComments(wstream, issue.number)
 
@@ -70,9 +69,11 @@ export class GhiDumper {
     for (const comment of commentsList) {
       wstream.write("<br/>\n")
       wstream.write(`<hr/>\n`)
+      wstream.write(`<div class='content'>\n`)
       wstream.write(`url:${comment.html_url}<br/>\n`)
       wstream.write(`created_at:${comment.created_at}, updated_at:${comment.updated_at}<br/><br/>\n`)
       wstream.write(marked.parse(comment.body))
+      wstream.write(`</div>\n`)
       wstream.write("<br/>\n")
     }
   }
@@ -97,16 +98,16 @@ export class GhiDumper {
 
   }
 
-  async _createOutDir(path: string){
+  async _createOutDir(path: string) {
     let accessRes
-    try{
+    try {
       accessRes = await fs.promises.access(path)
-    }catch(err){
-      if(err.errno == -4058){
+    } catch (err) {
+      if (err.errno == -4058) {
         // not created output directory yet
         fs.promises.mkdir(path)
       }
     }
-    
+
   }
 }

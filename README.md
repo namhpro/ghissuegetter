@@ -1,1 +1,5 @@
 # ghissuegetter
+
+```
+npm i
+```

@@ -3,6 +3,8 @@ import * as fs from "fs";
 import { marked } from 'marked';
 import * as path from 'path';
 
+export interface IssuePartly { number: number, title: string, body: string }
+
 export class GhiDumper {
   octokit: Octokit
   login: string
@@ -20,6 +22,15 @@ export class GhiDumper {
     this.login = login
   }
 
+  async getAIssue(issue_number: number) {
+    const resp = await this.octokit.rest.issues.get({
+      owner: this.login,
+      repo: this.repo,
+      issue_number,
+    })
+    return resp
+  }
+
   async writeFullIssueContents() {
     // https://github.com/octokit/plugin-paginate-rest.js/#octokitpaginateiterator
     const iterator = this.octokit.paginate.iterator(this.octokit.rest.issues.listForRepo, {
@@ -35,31 +46,32 @@ export class GhiDumper {
     for await (const { data: issues } of iterator) {
       for (const issue of issues) {
 
-        const filename = path.join(outDir, `${String(issue.number).padStart(2, '0')}-${issue.title.replace(/[\/\?\=\*]/g, '_')}.html`)
-
-        console.log("Issue #%d: %s", issue.number, issue.title);
-
-        const wstream = fs.createWriteStream(filename, { flags: 'w' })
-        wstream.on('close', () => {
-          console.log('done')
-        })
-
-        this._writeTemplate(wstream, issue.title)
-        wstream.write(`<h1>${issue.title}</h1>`)
-
-        const html = marked.parse(issue.body);
-        wstream.write(`<div class='content'>${html}</div>`)
-
-        await this._getAllComments(wstream, issue.number)
-
-        wstream.close()
-
+        await this.writeAIssue(issue as IssuePartly, outDir)
       }
     }
 
   }
 
-  async _getAllComments(wstream: fs.WriteStream, issueNumber: number) {
+  async writeAIssue(issue: IssuePartly, outDir: string) {
+
+    const filename = path.join(outDir, `${String(issue.number).padStart(2, '0')}-${issue.title.replace(/[\/\?\=\*]/g, '_')}.html`)
+    const wstream = fs.createWriteStream(filename, { flags: 'w' })
+    wstream.on('close', () => {
+      console.log('done')
+    })
+    console.log("Issue #%d: %s", issue.number, issue.title);
+    this._writeTemplate(wstream, issue.title)
+    wstream.write(`<h1>${issue.title}</h1>`)
+
+    const html = marked.parse(issue.body);
+    wstream.write(`<div class='content'>${html}</div>`)
+
+    await this.getAllComments(wstream, issue.number)
+
+    wstream.close()
+  }
+
+  async getAllComments(wstream: fs.WriteStream, issueNumber: number) {
     const { data: commentsList } = await this.octokit.rest.issues.listComments({
       owner: this.login,
       repo: this.repo,

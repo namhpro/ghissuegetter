@@ -13,7 +13,7 @@ export class GhiDumper {
   constructor(repo: string) {
     this.repo = repo
     // Create a personal access token at https://github.com/settings/tokens/new?scopes=repo
-    this.octokit = new Octokit({ auth: `...` });
+    this.octokit = new Octokit({ auth: `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` });
   }
 
   async getAuth() {
@@ -47,6 +47,7 @@ export class GhiDumper {
       for (const issue of issues) {
 
         await this.writeAIssue(issue as IssuePartly, outDir)
+
       }
     }
 
